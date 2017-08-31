@@ -18,3 +18,18 @@ mkdir sequences
 
 # Sequence Pre-processing 
 # Import the sequences and barcode file (barcode associated with each sequence) into a Qiime artifact 
+
+qiime tools import \
+   --type EMPPairedEndSequences \
+   --input-path sequences \
+   --output-path sequences.qza
+   
+# Demultiplexing - we will demultiplex the sequence.qza files to identify sequence reads associated with each sample. For this we will utilize the sample-metadata file which has information on the barcode associated with a particular sample
+# --p-reve-comp-mapping-barcodes indicates that the barcode reads are the reverse complement of what is listed on the sample-metadata file
+
+qiime demux emp-paired \
+  --m-barcodes-file sample-metadata.tsv \
+  --m-barcodes-category BarcodeSequence \
+  --i-seqs sequences.qza \
+  --o-per-sample-sequences demux \
+  --p-rev-comp-mapping-barcodes
