@@ -25,6 +25,7 @@ qiime tools import \
    --output-path sequences.qza
    
 # Demultiplexing - we will demultiplex the sequence.qza files to identify sequence reads associated with each sample. For this we will utilize the sample-metadata file which has information on the barcode associated with a particular sample
+# Within the sample metadata file the barcodes are present in a column called "BarcodeSequence"
 # --p-reve-comp-mapping-barcodes indicates that the barcode reads are the reverse complement of what is listed on the sample-metadata file
 
 qiime demux emp-paired \
@@ -33,3 +34,13 @@ qiime demux emp-paired \
   --i-seqs sequences.qza \
   --o-per-sample-sequences demux \
   --p-rev-comp-mapping-barcodes
+
+# Create a summary of the results using the following
+
+qiime demux summarize \
+  --i-data demux.qza \
+  --o-visualization demux.qzv
+
+#View the summary using the following command. The interactive plots are a great way to indentify where you sequences need to be trimmed
+
+qiime tools view demux.qzv
