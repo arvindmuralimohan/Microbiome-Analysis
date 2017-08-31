@@ -1,10 +1,20 @@
 
+
+# Getting set up
 mkdir Qiime # Make a directory called Qiime on the desktop
 cd ~/Desktop/Qiime # Make Qiime your current working directory
 
+#Downloading data files
+
 # Download sample-metadata file from - https://data.qiime2.org/2017.8/tutorials/atacama-soils/sample_metadata.tsv into current working directory
 # The sequencing type is "paired-end-sequencing" hence we will have to download the forward and reverse sequencing read
+# make a directory called sequences to store all the sequences and barcode you will download below
+
+mkdir sequences
+
 # Download forward sequencing reads from - https://data.qiime2.org/2017.8/tutorials/atacama-soils/10p/forward.fastq.gz, save as "forward.fastaq.gz"
 # Download the reverse sequencing reads from - https://data.qiime2.org/2017.8/tutorials/atacama-soils/10p/reverse.fastq.gz, save as "reverse.fastaq.gz"
 # Download the barcodes file for the sequencing from -  https://data.qiime2.org/2017.8/tutorials/atacama-soils/10p/barcodes.fastq.gz, save as "barcodes.fastaq.gz"
 
+# Sequence Pre-processing 
+# Import the sequences and barcode file (barcode associated with each sequence) into a Qiime artifact 
