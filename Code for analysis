@@ -74,3 +74,6 @@ qiime feature-table tabulate-seqs \
   --i-data rep-seqs.qza \
   --o-visualization rep-seqs.qzv
 
+# View representative sequences. This lets you BLAST sequences directly from an interactive browser page
+
+qiime tools view rep-seqs.qzv
