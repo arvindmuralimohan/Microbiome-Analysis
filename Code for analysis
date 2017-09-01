@@ -41,6 +41,36 @@ qiime demux summarize \
   --i-data demux.qza \
   --o-visualization demux.qzv
 
-#View the summary using the following command. The interactive plots are a great way to indentify where you sequences need to be trimmed
+# View the summary using the following command. The interactive plots are a great way to indentify where you sequences need to be trimmed
 
 qiime tools view demux.qzv
+
+# Denoise the de-multiplexed sequences to denoise the sequences. The same trimming parameters are used as the Qiime "Atacama Soil Microbiome" tutorial
+# The outputs are a "feature table" - table.qza and a "representative sequences" - rep-seqs.qza
+
+qiime dada2 denoise-paired \
+  --i-demultiplexed-seqs demux.qza \
+  --o-table table \
+  --o-representative-sequences rep-seqs \
+  --p-trim-left-f 13 \
+  --p-trim-left-r 13 \
+  --p-trunc-len-f 150 \
+  --p-trunc-len-r 150
+  
+# Summarizing feature table
+ 
+ qiime feature-table summarize \
+  --i-table table.qza \
+  --o-visualization table.qzv \
+  --m-sample-metadata-file sample-metadata.tsv
+
+# View feature table. The feature table is good summary of number of sequences per sample, OTU (feature) distribution, sample parameter distribution 
+
+qiime tools view table.qzv
+
+# Summarize representative sequences
+
+qiime feature-table tabulate-seqs \
+  --i-data rep-seqs.qza \
+  --o-visualization rep-seqs.qzv
+
