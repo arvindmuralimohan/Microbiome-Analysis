@@ -121,8 +121,15 @@ qiime tools export \
   table.qza \
   --output-dir exported-feature-table
  
- #Convert taxonomy table to tsv format. .tsv file is placed in the exported-taxonomy directory
+ # Convert taxonomy table to tsv format. .tsv file is placed in the exported-taxonomy directory
  
  qiime tools export \
   taxonomy.qza \
   --output-dir exported-taxonomy
+  
+ # Export tree to newick format. The .nwk file is placed in the exported-tree directory
+ 
+ qiime tools export \
+  unrooted-tree.qza \
+  --output-dir exported-tree
+
