@@ -77,3 +77,26 @@ qiime feature-table tabulate-seqs \
 # View representative sequences. This lets you BLAST sequences directly from an interactive browser page
 
 qiime tools view rep-seqs.qzv
+
+# Generating a Phylogenetic tree
+# To create a Phylogenetic tree first align the representative sequences. Here i use the MAFFT for multiple alignment 
+
+qiime alignment mafft \
+  --i-sequences rep-seqs.qza \
+  --o-alignment aligned-rep-seqs.qza
+  
+# Masking/filtering highly variable positions within sequences 
+
+qiime alignment mask \
+  --i-alignment aligned-rep-seqs.qza \
+  --o-masked-alignment masked-aligned-rep-seqs.qza
+
+# Generate phylogenetic tree from masked alignment
+
+qiime phylogeny fasttree \
+  --i-alignment masked-aligned-rep-seqs.qza \
+  --o-tree unrooted-tree.qza
+
+# Assigning taxonomy - assign taxonomy to the representative sequences by comparing them to a Greengenes database. 
+# The Greengenes data file can be downloaded from -  https://data.qiime2.org/2017.8/common/gg-13-8-99-515-806-nb-classifier.qza. According to a Qiime tutorial this file is contains sequences that have been trimmed to only include 250 bases from the V4 region of the 16S (515F/806R primer pair)
+
