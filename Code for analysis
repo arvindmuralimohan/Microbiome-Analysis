@@ -132,4 +132,17 @@ qiime tools export \
  qiime tools export \
   unrooted-tree.qza \
   --output-dir exported-tree
+  
+  
+#-------------R-----------------------------R----------------------R----------------------------R------------------------R
+
+# Analysis in Bioconductor
+
+# Reading sample-metadata file. This is .tsv file and can be read into R using the read.table command. However, make sure that the first line of the .tsv file does not start with a #. The header will be skipped this way
+
+metadata <- read.table("sample-metadata.tsv", sep = '\t', header = TRUE)
+
+# make rownames match the sample names. Necessary for Phyloseq analysis
+
+row.names(metadata) <- metadata$SampleID
 
