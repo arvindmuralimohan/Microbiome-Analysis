@@ -142,7 +142,79 @@ qiime tools export \
 
 metadata <- read.table("sample-metadata.tsv", sep = '\t', header = TRUE)
 
-# make rownames match the sample names. Necessary for Phyloseq analysis
+# make rownames match the sample names. Necessary for Phyloseq analysis. Also, remove the SampleID column as we already have them as row names
 
 row.names(metadata) <- metadata$SampleID
+metadata <- metadata[,-1]
 
+# import the tree file. The tree can be imported using the "ape" package
+
+library(ape)
+tree <- read.tree("tree.nwk")
+
+# When importing the otu table, there are a couple of pre-processing steps necessary as the .biom "otu table" is HDF5 format and not JSON format
+# you could convert into any of the following formats specified here - http://biom-format.org/documentation/biom_conversion.html
+# I am converting if into a tsv file and reading it in R
+
+#On terminal
+biom convert -i feature-table.biom -o feature-table.tsv --to-tsv
+
+# Remeber to remove the "#" before the OTUID when reading into R 
+otu <- read.table("feature-table.tsv", sep = "\t", header = T)
+
+# rename the rows to match the OTUIDs
+row.names(otu) <- otu$OTU.ID
+
+# remove the OTUID colume, we are using them as row names now
+otu <- otu[, -1]
+
+# Convert into a matrix object to eventually convert it into a Phyloseq object
+otu <- as.matrix(otu)
+
+# Reading the txonomic table 
+tax <- read.table("taxonomy.tsv", sep ="\t", header = T)
+
+# columns of tax will appear in an unwanted format 
+head(tax)
+#                        Feature.ID
+# 1 c9d87a2ee9bcf3a21da0f6c603c84a83
+# 2 272feda6f133cd04e5fae49be25239c2
+# 3 a43892b9151be6d14c786596f6e3d0a3
+# 4 8cd325fcb36b79aae77682bebc8ef342
+# 5 ea2ba746498e8a4ad830d050fbd3020d
+# 6 a226eaaa9d494dddfa94880f515d0a25
+                                                                                                              Taxon
+# 1                                                           k__Bacteria; p__Planctomycetes; c__; o__; f__; g__; s__
+# 2                    k__Bacteria; p__Planctomycetes; c__Planctomycetia; o__Pirellulales; f__Pirellulaceae; g__; s__
+# 3 k__Bacteria; p__Actinobacteria; c__Actinobacteria; o__Actinomycetales; f__Streptomycetaceae; g__Streptomyces; s__
+# 4                                    k__Bacteria; p__Chloroflexi; c__Thermomicrobia; o__JG30-KF-CM45; f__; g__; s__
+# 5                                      k__Bacteria; p__Chloroflexi; c__Ktedonobacteria; o__B12-WMSP1; f__; g__; s__
+# 6                       k__Bacteria; p__Actinobacteria; c__Thermoleophilia; o__Gaiellales; f__Gaiellaceae; g__; s__
+#   Confidence
+# 1  0.9989071
+# 2  0.9997050
+# 3  0.8357802
+# 4  0.9999974
+# 5  0.9999779
+# 6  0.9999989
+
+# We want to split the taxon column into "Kingdom", "Phylum".... "Species" and the contents should be include the "k__" or the "c__"
+
+# Create a taxtable from the tax file to split the taxon colum 
+
+taxtable <- colsplit(tax$Taxon, pattern = ";", names = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"))
+
+# Now remove the "k__" and the "c__" etc
+
+taxtable_1 <- colsplit(taxtable, pattern = "__", names = c("Whatever", "Kingdom", "Whatever", "Phylum", "Whatever", "Class", "Whatever", "Order", "Whatever", "Family", "Whatever", "Genus", "Whatever", "Species"))
+
+# Apply the following to each of the taxonomic columns 
+
+taxtable$Kingdom <- lapply(taxtable$Kingdom, FUN = function(x) gsub(".*__", "", x))
+taxtable$Phylum <- lapply(taxtable$Phylum, FUN = function(x) gsub(".*__", "", x))
+taxtable$Class <- lapply(taxtable$Class, FUN = function(x) gsub(".*__", "", x))
+taxtable$Order <- lapply(taxtable$Order, FUN = function(x) gsub(".*__", "", x))
+taxtable$Family <- lapply(taxtable$Family, FUN = function(x) gsub(".*__", "", x))
+taxtable$Genus <- lapply(taxtable$Genus, FUN = function(x) gsub(".*__", "", x))
+taxtable$Species <- lapply(taxtable$Species, FUN = function(x) gsub(".*__", "", x))
+taxtable$Kingdom <- lapply(taxtable$Kingdom, FUN = function(x) gsub(".*__", "", x))
