@@ -205,9 +205,6 @@ head(tax)
 taxtable <- colsplit(tax$Taxon, pattern = ";", names = c("Kingdom", "Phylum", "Class", "Order", "Family", "Genus", "Species"))
 
 # Now remove the "k__" and the "c__" etc
-
-taxtable_1 <- colsplit(taxtable, pattern = "__", names = c("Whatever", "Kingdom", "Whatever", "Phylum", "Whatever", "Class", "Whatever", "Order", "Whatever", "Family", "Whatever", "Genus", "Whatever", "Species"))
-
 # Apply the following to each of the taxonomic columns 
 
 taxtable$Kingdom <- lapply(taxtable$Kingdom, FUN = function(x) gsub(".*__", "", x))
@@ -217,4 +214,20 @@ taxtable$Order <- lapply(taxtable$Order, FUN = function(x) gsub(".*__", "", x))
 taxtable$Family <- lapply(taxtable$Family, FUN = function(x) gsub(".*__", "", x))
 taxtable$Genus <- lapply(taxtable$Genus, FUN = function(x) gsub(".*__", "", x))
 taxtable$Species <- lapply(taxtable$Species, FUN = function(x) gsub(".*__", "", x))
-taxtable$Kingdom <- lapply(taxtable$Kingdom, FUN = function(x) gsub(".*__", "", x))
+
+#Convert contents into characters
+taxtable <- data.frame(lapply(taxtable, as.character), stringsAsFactors=FALSE)
+
+# Assign OTUIDs/FeatureIDs as rownames to tax
+row.names(taxtable) <- tax$Feature.ID
+
+# Make phyloseq objects from metadata, otu table, taxonomy table and tree
+otu <- otu_table(otu, taxa_are_rows = T)
+metadata <- sample_data(metadata)
+tree <- phy_tree(tree)
+taxtable <- tax_table(as.matrix(taxtable))
+
+#Combine into Phyloseq object
+
+atacama_phyloseq <- phyloseq(otu, taxtable, tree, metadata)
+
